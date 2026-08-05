@@ -3,6 +3,7 @@
 Bem-vindo à primeira fase do Tech Challenge do curso de DevOps! Neste projeto, construiremos uma plataforma de *Feature Flag as a Service* chamada **ToggleMaster**.
 
 > ### 📂 Documentação do Grupo 2
+> - 📗 **[PASSO-A-PASSO-COMPLETO.md](PASSO-A-PASSO-COMPLETO.md)** — reprodução manual de tudo (do zero) + guia de estudo e conceitos.
 > - 📘 **[GUIA-CONSULTA.md](GUIA-CONSULTA.md)** — o que foi feito + como consultar a app (aqui) e navegar na AWS Academy (caminhos no console).
 > - 🧭 **[ARQUITETURA.md](ARQUITETURA.md)** — desenho na AWS, decisões e estimativa de custos (com diagrama).
 > - 🚀 **[DEPLOY.md](DEPLOY.md)** — guia manual passo-a-passo (VPC, EC2, RDS, Security Groups) no AWS Console.
