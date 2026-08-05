@@ -60,12 +60,12 @@ Provisionado no **AWS Academy Learner Lab** (conta `537132640408`, role `voclabs
 
 ## 5. Evidências
 
-_Insira prints/links comprovando:_
+Prints da aplicação rodando na AWS em [docs/evidencias/](docs/evidencias/):
 
-- [ ] Aplicação rodando localmente com Docker (`curl localhost:5000/health`).
-- [ ] Instância EC2 no ar com IP público.
-- [ ] RDS criado e conectado (resposta dos endpoints `/flags`).
-- [ ] Configuração dos Security Groups (regra 5432 apontando para o SG da EC2).
+- [x] Instância EC2 no ar com IP público — [app-health.png](docs/evidencias/app-health.png)
+- [x] RDS criado e conectado (resposta dos endpoints `/flags`) — [app-flags.png](docs/evidencias/app-flags.png), [app-flag-especifica.png](docs/evidencias/app-flag-especifica.png)
+- [ ] Aplicação rodando localmente com Docker (`curl localhost:5000/health`) — _capturar no vídeo_
+- [ ] Configuração dos Security Groups (regra 5432 apontando para o SG da EC2) — _capturar no console (vídeo)_
 
 ## 6. Desafios encontrados e decisões tomadas
 

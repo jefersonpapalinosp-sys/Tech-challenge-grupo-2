@@ -21,6 +21,11 @@ Na nuvem, separamos essas duas responsabilidades em dois serviços gerenciados:
 
 ## 2. Diagrama
 
+![Diagrama da arquitetura ToggleMaster na AWS](docs/diagrama-arquitetura.png)
+
+> Versão renderizada (PNG). Abaixo, a mesma arquitetura como código (Mermaid), e o fonte
+> editável em [docs/arquitetura.drawio](docs/arquitetura.drawio).
+
 ```mermaid
 flowchart TB
     user([Usuário / Cliente API<br/>curl · Postman]):::ext
