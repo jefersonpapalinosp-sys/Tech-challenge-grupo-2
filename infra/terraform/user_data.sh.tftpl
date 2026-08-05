@@ -1,0 +1,32 @@
+#!/bin/bash
+set -euxo pipefail
+
+# ToggleMaster - bootstrap da EC2 (Amazon Linux 2023)
+# Instala Docker + Git, clona o repositório, builda a imagem e sobe o container
+# apontando para o RDS. As credenciais chegam via Terraform (templatefile).
+
+dnf update -y
+dnf install -y docker git
+systemctl enable --now docker
+
+# Clona o projeto
+cd /opt
+rm -rf togglemaster
+git clone "${repo_url}" togglemaster
+cd togglemaster
+
+# Build da imagem a partir do Dockerfile do projeto
+docker build -t togglemaster:latest .
+
+# Sobe a aplicação conectada ao RDS. --restart always garante retorno após reboot.
+docker rm -f togglemaster >/dev/null 2>&1 || true
+docker run -d --name togglemaster --restart always \
+  -p ${app_port}:5000 \
+  -e DB_HOST='${db_host}' \
+  -e DB_PORT='5432' \
+  -e DB_NAME='${db_name}' \
+  -e DB_USER='${db_user}' \
+  -e DB_PASSWORD='${db_password}' \
+  togglemaster:latest
+
+echo "Bootstrap concluido."
