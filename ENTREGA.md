@@ -31,9 +31,31 @@ Resumo da arquitetura implantada (detalhes em [ARQUITETURA.md](ARQUITETURA.md)):
 ## 4. Como foi feito o deploy
 
 - [ ] Manual pelo AWS Console — passo-a-passo em [DEPLOY.md](DEPLOY.md)
-- [ ] Automatizado com Terraform — [infra/terraform/](infra/terraform/)
+- [x] **Automatizado com Terraform** — [infra/terraform/](infra/terraform/)
 
-_(Marque a opção utilizada e descreva brevemente a execução.)_
+Provisionado no **AWS Academy Learner Lab** (conta `537132640408`, role `voclabs`) via
+`terraform apply` — **12 recursos** criados de uma vez (VPC, 2 subnets, IGW, route table,
+2 Security Groups, DB Subnet Group, RDS e EC2). A EC2 sobe a aplicação automaticamente pelo
+`user_data` (Docker build + run apontando para o RDS).
+
+> **Observação de região:** o lab **bloqueia us-east-2** (Ohio) para EC2/VPC
+> (`UnauthorizedOperation`). As regiões liberadas são **us-east-1** e us-west-2 — por isso o
+> deploy foi feito em **us-east-1** (N. Virginia).
+
+### Recursos provisionados (evidência)
+
+| Item | Valor |
+| :--- | :---- |
+| Região | `us-east-1` |
+| URL da aplicação | http://54.237.129.141:5000 |
+| Health check | http://54.237.129.141:5000/health → `{"status":"ok"}` |
+| IP público EC2 | `54.237.129.141` (instância `i-000c923085ffa7de1`, t3.micro) |
+| Endpoint RDS | `togglemaster-db.cpr3sig84ykp.us-east-1.rds.amazonaws.com` (não público) |
+| VPC | `vpc-090d321e9f286e710` (10.0.0.0/16) |
+| Key pair (SSH) | `vockey` |
+
+> ⚠️ O IP público muda a cada `stop/start` da EC2. Se o lab reiniciar, rode
+> `terraform apply` de novo (ou `terraform output`) para pegar o novo IP.
 
 ## 5. Evidências
 
