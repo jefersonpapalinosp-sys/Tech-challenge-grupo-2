@@ -16,7 +16,8 @@
 | Item | Link |
 | :--- | :--- |
 | 🎥 Vídeo de demonstração (até 15 min) | _colar o link (YouTube não listado / Drive)_ |
-| 🧭 Diagrama de arquitetura | _colar o link (draw.io / Miro)_ — versão no repo: [ARQUITETURA.md](ARQUITETURA.md) |
+| 🧭 Diagrama de arquitetura | Editável: [docs/arquitetura.drawio](docs/arquitetura.drawio) · versão no repo: [ARQUITETURA.md](ARQUITETURA.md) · _(opcional: link Miro/draw.io publicado)_ |
+| 🎬 Roteiro do vídeo | [docs/ROTEIRO-VIDEO.md](docs/ROTEIRO-VIDEO.md) |
 | 💻 Repositório | https://github.com/jefersonpapalinosp-sys/Tech-challenge-grupo-2 |
 
 ## 3. Arquitetura da solução

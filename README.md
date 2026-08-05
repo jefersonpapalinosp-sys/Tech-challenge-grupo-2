@@ -6,6 +6,8 @@ Bem-vindo à primeira fase do Tech Challenge do curso de DevOps! Neste projeto, 
 > - 🧭 **[ARQUITETURA.md](ARQUITETURA.md)** — desenho na AWS, decisões e estimativa de custos (com diagrama).
 > - 🚀 **[DEPLOY.md](DEPLOY.md)** — guia manual passo-a-passo (VPC, EC2, RDS, Security Groups) no AWS Console.
 > - 🤖 **[infra/terraform/](infra/terraform/)** — provisionamento automatizado (Terraform, bônus).
+> - 🖼️ **[docs/arquitetura.drawio](docs/arquitetura.drawio)** — diagrama editável (importe no [draw.io](https://app.diagrams.net)).
+> - 🎬 **[docs/ROTEIRO-VIDEO.md](docs/ROTEIRO-VIDEO.md)** — roteiro do vídeo de demonstração (15 min).
 > - 📋 **[ENTREGA.md](ENTREGA.md)** — relatório de entrega (participantes, links, decisões).
 >
 > _O restante deste README é o enunciado original do desafio._
