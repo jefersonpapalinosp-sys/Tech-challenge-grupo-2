@@ -1,3 +1,17 @@
+## Tech Challenge — Fase 2
+
+A implementação em microsserviços está em [fase2/](fase2/README.md), com cinco aplicações, Docker Compose, manifestos EKS e testes.
+Para executar a Fase 2, entre nessa pasta antes de usar os comandos:
+
+```powershell
+Set-Location .\fase2
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-local.ps1
+```
+
+A documentação abaixo corresponde à Fase 1.
+
+---
+
 # Tech Challenge - Fase 1: Plataforma "ToggleMaster"
 
 Bem-vindo à primeira fase do Tech Challenge do curso de DevOps! Neste projeto, construiremos uma plataforma de *Feature Flag as a Service* chamada **ToggleMaster**.
