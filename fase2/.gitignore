@@ -41,3 +41,6 @@ docs/AWS LAB*.txt
 ~$*
 docs/historico/
 k8s-aws/togglemaster-render.yaml
+
+# Gravacoes e videos editados (grandes demais para o git)
+*.mp4

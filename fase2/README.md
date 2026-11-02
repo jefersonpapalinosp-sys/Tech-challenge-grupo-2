@@ -2,16 +2,24 @@
 
 Implementação local e em AWS da arquitetura de microsserviços descrita no **POSTECH - Tech Challenge - Fase 2**. O relatório final distingue configuração, evidência coletada e itens ainda sem comprovação.
 
-## Código da Fase 2
+## Código e entrega
 
-Este projeto fica na pasta [fase2/](https://github.com/jefersonpapalinosp-sys/Tech-challenge-grupo-2/tree/main/fase2) do repositório do grupo. A raiz mantém o projeto da Fase 1.
+O código da Fase 2 está em [`fase2/` no repositório do grupo](https://github.com/jefersonpapalinosp-sys/Tech-challenge-grupo-2/tree/main/fase2). A raiz desse repositório preserva o projeto da Fase 1.
 
 ```powershell
 git clone https://github.com/jefersonpapalinosp-sys/Tech-challenge-grupo-2.git
 Set-Location .\Tech-challenge-grupo-2\fase2
 ```
 
-Os relatórios de entrega e as evidências do laboratório são distribuídos separadamente pela equipe.
+- [Relatório final em PDF](docs/Relatorio_Implantacao_AWS_ToggleMaster_ATUALIZADO_FINAL.pdf)
+- [Relatório final em Word](docs/Relatorio_Implantacao_AWS_ToggleMaster_ATUALIZADO_FINAL.docx)
+- [Relatório em texto, incluindo comparação com os entregáveis](docs/Relatorio_Implantacao_AWS_ToggleMaster_ATUALIZADO_FINAL.txt)
+- [Conferência dos entregáveis](docs/CONFERENCIA_ENTREGAVEIS_FIAP.txt)
+- [Evidências datadas do LAB 2](docs/evidencias_aws_2026-10-30)
+- [Ensaio de escala do analytics, 02/11/2026](docs/evidencias_aws_2026-11-02)
+- [Scripts e comandos do ensaio](apresentacao/scripts)
+
+O relatório explica a escolha de HPA por CPU para o analytics e os propósitos de RDS, ElastiCache e DynamoDB. Os ensaios arquivados comprovam a escala de evaluation e, em 02/11/2026, a de analytics: 6000 mensagens enviadas manualmente ao SQS, de 1 para 5 réplicas por CPU, retorno a 1 réplica e 6000 eventos no DynamoDB. LocalStack e Classic Load Balancer são diferenças declaradas em relação aos produtos citados no enunciado.
 
 ## O que está incluído
 
@@ -128,7 +136,7 @@ Endpoint atual:
 http://a5bc56a01f92c4e85887af601f04b84e-1447597342.us-east-1.elb.amazonaws.com
 ```
 
-Rotas públicas: `/auth`, `/flags`, `/rules` e `/evaluate`. O fluxo Auth → Flag → Targeting → Evaluation → SQS → Analytics → DynamoDB está registrado nas evidências datadas. Consulte [k8s-aws/README.md](k8s-aws/README.md) para a configuração. Os resultados e limites de comprovação constam do relatório entregue separadamente. O endereço observado pode mudar se o Load Balancer for recriado.
+Rotas públicas: `/auth`, `/flags`, `/rules` e `/evaluate`. O fluxo Auth → Flag → Targeting → Evaluation → SQS → Analytics → DynamoDB está registrado nas evidências datadas. Consulte [k8s-aws/README.md](k8s-aws/README.md) para a configuração e o [relatório final](docs/Relatorio_Implantacao_AWS_ToggleMaster_ATUALIZADO_FINAL.pdf) para os resultados e limites de comprovação. O endereço observado pode mudar se o Load Balancer for recriado.
 
 ## Verificações estáticas
 
