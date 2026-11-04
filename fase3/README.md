@@ -1,6 +1,11 @@
 # ToggleMaster — Tech Challenge Fase 3
 
-Automação do ciclo de vida dos 5 microsserviços com CI/CD, DevSecOps e GitOps. A pasta [`fase2/`](../fase2/README.md) fica como foi entregue, e todo o trabalho novo acontece aqui.
+Automação do ciclo de vida dos 5 microsserviços com CI/CD, DevSecOps e GitOps. A pasta [`fase2/`](../fase2/README.md) fica como foi entregue, e todo o trabalho novo acontece aqui. A entrega é em 19/01/2027.
+
+## Documentos
+
+- [Guia passo a passo](docs/ToggleMaster_Fase3_Guia_Passo_a_Passo.docx): como baixar, executar e testar o projeto na sua máquina, mesmo sem experiência com Docker ou Kubernetes.
+- [Status item por item](docs/ToggleMaster_Fase3_Status_Item_a_Item.docx): o que foi feito, o que já existe e o que falta.
 
 ## Situação
 
@@ -20,6 +25,7 @@ Automação do ciclo de vida dos 5 microsserviços com CI/CD, DevSecOps e GitOps
   ci-<serviço>.yml         Um workflow por serviço
 fase3/
   <serviço>/               Código e Dockerfile dos 5 serviços
+  docs/                    Guia passo a passo e status
   docker-compose.yml       Ambiente local, com portas diferentes das da Fase 2
   gitops/                  Manifestos Kubernetes observados pelo ArgoCD
     argocd/root-app.yaml   Application raiz, que cria todas as outras
@@ -49,7 +55,7 @@ Cada serviço tem um workflow, disparado em todo Pull Request e em push na `main
 | SCA | Trivy `fs` | Trivy `fs` | Vulnerabilidade crítica |
 | SAST | gosec | bandit | Severidade alta |
 | Imagem | `docker build`, Trivy `image` | `docker build`, Trivy `image` | Vulnerabilidade crítica |
-| Publicação | Push no ECR com tag `v1.0.0-<hash>` | Igual | Só em push na `main` |
+| Publicação | Push no ECR com tag `v1.0.0-<hash>` | Igual | Só em push ou disparo manual na `main` |
 | GitOps | Commit da nova imagem no `deployment.yaml` | Igual | Só depois da publicação |
 
 `gosec` e `bandit` não têm nível crítico, por isso o limite deles é a severidade alta. Em Pull Request, a imagem é construída e analisada, mas não é publicada.
@@ -64,7 +70,7 @@ Em um Pull Request, adicione esta linha a `fase3/flag-service/requirements.txt`:
 PyYAML==5.3.1
 ```
 
-A instalação funciona e o passo de SCA reprova com a CVE-2020-14343, de severidade crítica. Remova a linha e o pipeline volta a passar. Para mostrar SAST, use `InsecureSkipVerify: true` em um serviço Go ou `subprocess.check_output(cmd, shell=True)` em um serviço Python.
+A instalação funciona e o passo de SCA reprova com a CVE-2020-14343, de severidade crítica. Para corrigir, troque a linha por `PyYAML==6.0.2`, e o pipeline volta a passar. Não apague a linha: sem nenhuma diferença na pasta do serviço, o filtro de pastas não dispara o workflow de novo no Pull Request. Para mostrar SAST, use `InsecureSkipVerify: true` em um serviço Go ou `subprocess.check_output(cmd, shell=True)` em um serviço Python.
 
 ## Configuração no GitHub quando a AWS estiver pronta
 
@@ -80,9 +86,11 @@ Em **Settings > Secrets and variables > Actions**:
 
 Sem `ECR_REGISTRY`, a publicação e a atualização da tag são puladas, e o restante do pipeline funciona normalmente. No AWS Academy, os três segredos expiram com a sessão e precisam ser atualizados a cada laboratório.
 
+Para publicar sem alterar a pasta do serviço, abra **Actions**, escolha o workflow do serviço e clique em **Run workflow**, na branch `main`. O botão só aparece depois que os workflows estiverem na `main`.
+
 Em **Settings > Actions > General**, deixe **Workflow permissions** como leitura: o pipeline pede escrita só no job que grava a tag.
 
-**Proteção da `main`:** ao exigir Pull Request, libere o GitHub Actions para gravar na `main` ou o commit da tag será recusado, porque os manifestos estão neste mesmo repositório. Se marcar os workflows como verificações obrigatórias, lembre que cada um só roda quando a pasta do serviço muda.
+**Proteção da `main`:** o commit automático da tag grava direto na `main`, porque os manifestos estão neste mesmo repositório. Segundo relatos da comunidade, o `GITHUB_TOKEN` não pode entrar na lista de exceções da proteção, então confirme isso ao configurar. Por enquanto, bloqueie só force push e exclusão da branch. Para exigir Pull Request, coloque uma deploy key ou um GitHub App na lista de exceções e faça o job da tag usar essa credencial. Se marcar os workflows como verificações obrigatórias, lembre que cada um só roda quando a pasta do serviço muda.
 
 ## GitOps
 
