@@ -7,8 +7,8 @@ Automação do ciclo de vida dos 5 microsserviços com CI/CD, DevSecOps e GitOps
 | Parte | Estado |
 |---|---|
 | Serviços, Dockerfiles e Compose local | Prontos, com teste ponta a ponta local aprovado |
-| Workflows de CI e DevSecOps | Prontos; a publicação no ECR e a atualização da tag só rodam com a AWS configurada |
-| Manifestos GitOps e Applications do ArgoCD | Prontos; a execução na AWS ainda não foi testada |
+| Workflows de CI e DevSecOps | Prontos e testados no GitHub Actions; a publicação no ECR e a atualização da tag só rodam com a AWS configurada |
+| Manifestos GitOps e Applications do ArgoCD | Prontos e testados em `kind`, com segredos falsos; a execução na AWS ainda não foi testada |
 | Terraform | Pendente: precisa da conta AWS definida para ser testado |
 | Vídeo e relatório | Pendentes |
 
