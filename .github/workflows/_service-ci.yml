@@ -1,0 +1,222 @@
+name: Pipeline de serviço (reutilizável)
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        description: Pasta do serviço dentro de fase3/
+        type: string
+        required: true
+      language:
+        description: go ou python
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  SERVICE: ${{ inputs.service }}
+  SERVICE_DIR: fase3/${{ inputs.service }}
+  IMAGE_VERSION: v1.0.0
+  # Ferramentas fixadas por versão e digest. Atualize de forma consciente, nunca com "latest".
+  TRIVY_IMAGE: aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
+  GOLANGCI_IMAGE: golangci/golangci-lint:v2.15.0@sha256:fbfcfd12a6f8d7f1b97b3362ca80fc2a244d46863148c73cb88e7793af96c481
+  GOSEC_VERSION: v2.30.0
+  FLAKE8_VERSION: 7.3.0
+  BANDIT_VERSION: 1.9.4
+
+jobs:
+  build-test:
+    name: Build e testes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preparar o Go
+        if: inputs.language == 'go'
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: ${{ env.SERVICE_DIR }}/go.mod
+          cache-dependency-path: ${{ env.SERVICE_DIR }}/go.sum
+
+      - name: Preparar o Python
+        if: inputs.language == 'python'
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: Compilar e testar (Go)
+        if: inputs.language == 'go'
+        working-directory: ${{ env.SERVICE_DIR }}
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          go build ./...
+          go test ./...
+
+      - name: Instalar dependências e compilar (Python)
+        if: inputs.language == 'python'
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: |
+          python -m pip install -r requirements.txt
+          python -m compileall -q .
+          if compgen -G "test_*.py" > /dev/null; then
+            python -m pip install pytest
+            python -m pytest
+          else
+            echo "Este serviço não tem testes unitários."
+          fi
+
+  lint:
+    name: Lint
+    needs: build-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: golangci-lint (Go)
+        if: inputs.language == 'go'
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -w "/repo/$SERVICE_DIR" "$GOLANGCI_IMAGE" \
+            golangci-lint run --config /repo/fase3/.golangci.yml ./...
+
+      - name: Preparar o Python
+        if: inputs.language == 'python'
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: flake8 (Python)
+        if: inputs.language == 'python'
+        run: |
+          python -m pip install "flake8==$FLAKE8_VERSION"
+          flake8 --config fase3/.flake8 "$SERVICE_DIR"
+
+  security:
+    name: Segurança (SCA e SAST)
+    needs: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Relatório SCA de alertas altos e críticos (não bloqueia)
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -v "$RUNNER_TEMP/trivy:/root/.cache" "$TRIVY_IMAGE" \
+            fs --scanners vuln --severity HIGH,CRITICAL --exit-code 0 --no-progress "/repo/$SERVICE_DIR"
+
+      - name: SCA com bloqueio em vulnerabilidade crítica (Trivy)
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -v "$RUNNER_TEMP/trivy:/root/.cache" "$TRIVY_IMAGE" \
+            fs --scanners vuln --severity CRITICAL --exit-code 1 --no-progress "/repo/$SERVICE_DIR"
+
+      - name: Preparar o Go
+        if: inputs.language == 'go'
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: ${{ env.SERVICE_DIR }}/go.mod
+          cache-dependency-path: ${{ env.SERVICE_DIR }}/go.sum
+
+      - name: SAST com bloqueio em severidade alta (gosec)
+        if: inputs.language == 'go'
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: |
+          go install "github.com/securego/gosec/v2/cmd/gosec@$GOSEC_VERSION"
+          "$(go env GOPATH)/bin/gosec" -severity high ./...
+
+      - name: Preparar o Python
+        if: inputs.language == 'python'
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: SAST com bloqueio em severidade alta (bandit)
+        if: inputs.language == 'python'
+        run: |
+          python -m pip install "bandit==$BANDIT_VERSION"
+          bandit -lll -r "$SERVICE_DIR"
+
+  docker:
+    name: Imagem Docker
+    needs: security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      # Só a main publica, e só depois que a AWS estiver configurada no repositório.
+      PUBLISH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ECR_REGISTRY != '' }}
+      ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+    outputs:
+      image: ${{ steps.push.outputs.image }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Construir a imagem
+        run: |
+          TAG="${IMAGE_VERSION}-${GITHUB_SHA::7}"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          docker build --pull -t "$SERVICE:$TAG" "$SERVICE_DIR"
+
+      - name: Scan da imagem com bloqueio em vulnerabilidade crítica (Trivy)
+        run: |
+          mkdir -p "$RUNNER_TEMP/scan"
+          docker save -o "$RUNNER_TEMP/scan/image.tar" "$SERVICE:$TAG"
+          docker run --rm -v "$RUNNER_TEMP/scan:/scan:ro" -v "$RUNNER_TEMP/trivy:/root/.cache" "$TRIVY_IMAGE" \
+            image --scanners vuln --severity CRITICAL --exit-code 1 --no-progress --input /scan/image.tar
+
+      - name: Login no ECR
+        if: env.PUBLISH == 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: |
+          aws ecr get-login-password --region "$AWS_REGION" |
+            docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
+      - name: Enviar a imagem ao ECR
+        id: push
+        if: env.PUBLISH == 'true'
+        run: |
+          IMAGE="$ECR_REGISTRY/togglemaster/$SERVICE:$TAG"
+          docker tag "$SERVICE:$TAG" "$IMAGE"
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Avisar que a publicação não ocorreu
+        if: env.PUBLISH != 'true'
+        run: echo "::notice::Imagem construída e analisada, sem publicar. A publicação exige push na main e a variável ECR_REGISTRY."
+
+  update-gitops:
+    name: Atualizar a tag no GitOps
+    needs: docker
+    if: needs.docker.outputs.image != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      IMAGE: ${{ needs.docker.outputs.image }}
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Gravar a nova tag e enviar o commit
+        run: bash fase3/scripts/update-gitops-tag.sh "$SERVICE" "$IMAGE"

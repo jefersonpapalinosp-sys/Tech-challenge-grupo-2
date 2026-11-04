@@ -1,0 +1,33 @@
+name: CI auth-service
+
+on:
+  pull_request:
+    paths:
+      - "fase3/auth-service/**"
+      - "fase3/.golangci.yml"
+      - ".github/workflows/ci-auth-service.yml"
+      - ".github/workflows/_service-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "fase3/auth-service/**"
+      - "fase3/.golangci.yml"
+      - ".github/workflows/ci-auth-service.yml"
+      - ".github/workflows/_service-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-auth-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pipeline:
+    permissions:
+      contents: write
+    uses: ./.github/workflows/_service-ci.yml
+    with:
+      service: auth-service
+      language: go
+    secrets: inherit

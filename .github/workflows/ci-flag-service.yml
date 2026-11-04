@@ -1,0 +1,33 @@
+name: CI flag-service
+
+on:
+  pull_request:
+    paths:
+      - "fase3/flag-service/**"
+      - "fase3/.flake8"
+      - ".github/workflows/ci-flag-service.yml"
+      - ".github/workflows/_service-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "fase3/flag-service/**"
+      - "fase3/.flake8"
+      - ".github/workflows/ci-flag-service.yml"
+      - ".github/workflows/_service-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-flag-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pipeline:
+    permissions:
+      contents: write
+    uses: ./.github/workflows/_service-ci.yml
+    with:
+      service: flag-service
+      language: python
+    secrets: inherit
