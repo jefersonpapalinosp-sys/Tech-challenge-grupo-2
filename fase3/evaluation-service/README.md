@@ -55,7 +55,7 @@ Ele funciona da seguinte forma:
     
     # --- Configuração da AWS (Obrigatório para o desafio) ---
     # Cole a URL da fila SQS que você criou no console da AWS
-    AWS_SQS_URL="https://sqs.us-east-1.amazonaws.com/533267349027/tgmqueue"
+    AWS_SQS_URL="https://sqs.us-east-1.amazonaws.com/<conta>/<fila>"
     
     # Região da sua fila SQS
     AWS_REGION="us-east-1" 
