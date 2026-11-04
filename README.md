@@ -1,3 +1,13 @@
+## Tech Challenge — Fase 3
+
+A automação com CI/CD, DevSecOps e GitOps está em [fase3/](fase3/README.md). Os workflows ficam em [.github/workflows/](.github/workflows/).
+Para executar a Fase 3 localmente, entre nessa pasta antes de usar os comandos:
+
+```powershell
+Set-Location .\fase3
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-local.ps1
+```
+
 ## Tech Challenge — Fase 2
 
 A implementação em microsserviços está em [fase2/](fase2/README.md), com cinco aplicações, Docker Compose, manifestos EKS e testes.
