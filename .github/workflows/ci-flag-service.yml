@@ -1,6 +1,7 @@
 name: CI flag-service
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "fase3/flag-service/**"

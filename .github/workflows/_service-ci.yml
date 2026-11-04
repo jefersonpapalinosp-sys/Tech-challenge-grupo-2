@@ -154,8 +154,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
-      # Só a main publica, e só depois que a AWS estiver configurada no repositório.
-      PUBLISH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ECR_REGISTRY != '' }}
+      # Só a main publica, por push ou disparo manual, e só depois que a AWS estiver configurada no repositório.
+      PUBLISH: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && vars.ECR_REGISTRY != '' }}
       ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
       AWS_REGION: ${{ vars.AWS_REGION }}
     outputs:
@@ -200,7 +200,7 @@ jobs:
 
       - name: Avisar que a publicação não ocorreu
         if: env.PUBLISH != 'true'
-        run: echo "::notice::Imagem construída e analisada, sem publicar. A publicação exige push na main e a variável ECR_REGISTRY."
+        run: echo "::notice::Imagem construída e analisada, sem publicar. A publicação exige push ou disparo manual na main e a variável ECR_REGISTRY."
 
   update-gitops:
     name: Atualizar a tag no GitOps
