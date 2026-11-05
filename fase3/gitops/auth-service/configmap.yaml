@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  name: auth-config
+  namespace: auth-service
+data:
+  PORT: "8001"
