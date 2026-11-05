@@ -29,8 +29,11 @@ if (($clusters -split '\s+') -contains $ClusterName) {
 
     $deadline = [DateTime]::UtcNow.AddMinutes(10)
     do {
-        $services = kubectl get services --all-namespaces `
-            -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}'
+        # A terceira coluna da listagem é o tipo do Service.
+        $all = kubectl get services --all-namespaces --no-headers
+        if ($LASTEXITCODE -ne 0) { throw 'Não foi possível listar os Services do cluster.' }
+        $services = @($all | Where-Object { ($_ -split '\s+')[2] -eq 'LoadBalancer' } |
+            ForEach-Object { $p = $_ -split '\s+'; "$($p[0])/$($p[1])" })
         if ($services) {
             Write-Host "Aguardando a remoção de: $($services -join ', ')"
             Start-Sleep -Seconds 15
