@@ -11,3 +11,12 @@ docker-compose.override.yml
 *.pem
 *.key
 .aws/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+terraform.tfvars
+backend.hcl

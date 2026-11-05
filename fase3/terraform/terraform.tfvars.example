@@ -1,0 +1,14 @@
+# Todos os valores têm padrão, então este arquivo é opcional.
+# Copie para terraform.tfvars só se quiser mudar algum deles.
+
+# aws_region = "us-east-1"
+# project    = "togglemaster"
+
+# No AWS Academy, as duas roles são a LabRole. Em uma conta pessoal, crie as
+# roles do cluster e dos nós antes e informe os nomes aqui.
+# eks_cluster_role_name = "LabRole"
+# eks_node_role_name    = "LabRole"
+
+# kubernetes_version  = "1.37"
+# node_instance_types = ["t3.medium"]
+# node_desired_size   = 2

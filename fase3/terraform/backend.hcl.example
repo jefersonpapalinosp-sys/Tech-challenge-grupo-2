@@ -1,0 +1,3 @@
+# Copie para backend.hcl e troque pelo nome do seu bucket.
+# O script ..\scripts\aws-bootstrap-state.ps1 cria o bucket e grava este arquivo sozinho.
+bucket = "togglemaster-tfstate-<id-da-conta>"
