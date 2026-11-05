@@ -180,6 +180,7 @@ Cuidados:
 
 - **Imagens depois de recriar:** o `destroy` apaga os repositórios do ECR com as imagens. Ao recriar o ambiente, rode de novo os 5 workflows antes de instalar o ArgoCD, ou os pods ficam sem imagem.
 - **Ordem do `destroy`:** o Load Balancer do ingress é criado pelo Kubernetes, fora do Terraform. O script apaga primeiro as Applications e só depois roda o `terraform destroy`. Sem isso, a exclusão da VPC trava.
+- **Depois de desmontar:** apague a variável `ECR_REGISTRY` no GitHub. Com ela cadastrada, o próximo push na `main` tenta publicar em um ECR que não existe mais, e o pipeline falha. Sem ela, o pipeline só constrói e analisa.
 - **Credenciais do AWS Academy:** expiram com a sessão. A cada laboratório, atualize o AWS CLI e os 3 segredos do GitHub.
 - **Custo:** o ambiente consome créditos enquanto está de pé. Desmonte ao terminar.
 
